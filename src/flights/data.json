@@ -1,0 +1,127 @@
+[
+    {
+        "url": "https://www.google.com/travel/flights?tfs=GhoSCjIwMjUtMDctMDJqBRIDQ0RHcgUSA0tJWEIDAQECSAGYAQI=&curr=EUR",
+        "flight_data": [
+            {
+                "airline": "THAI; ",
+                "time": "1:40 PM on Wed, Jul 2; 3:55 PM on Thu, Jul 3; ",
+                "price": "€1,966"
+            },
+            {
+                "airline": "Air France, KLM; ",
+                "time": "12:15 PM on Wed, Jul 2; 10:20 AM on Thu, Jul 3; ",
+                "price": "€2,118"
+            },
+            {
+                "airline": "China Southern; ",
+                "time": "12:25 PM on Wed, Jul 2; 1:10 PM on Thu, Jul 3; ",
+                "price": "€2,183"
+            },
+            {
+                "airline": "China Southern; ",
+                "time": "12:25 PM on Wed, Jul 2; 9:00 PM on Thu, Jul 3; ",
+                "price": "€1,815"
+            },
+            {
+                "airline": "KLM; ",
+                "time": "10:15 AM on Wed, Jul 2; 10:20 AM on Thu, Jul 3; ",
+                "price": "€2,121"
+            },
+            {
+                "airline": "Vietnam Airlines; ",
+                "time": "2:00 PM on Wed, Jul 2; 6:40 AM on Fri, Jul 4; ",
+                "price": "€2,186"
+            },
+            {
+                "airline": "SWISS, THAI; ",
+                "time": "6:45 AM on Wed, Jul 2; 3:55 PM on Thu, Jul 3; ",
+                "price": "€2,292"
+            },
+            {
+                "airline": "China Eastern; ",
+                "time": "1:25 PM on Wed, Jul 2; 12:10 PM on Thu, Jul 3; ",
+                "price": "€2,401"
+            },
+            {
+                "airline": "Emirates; ",
+                "time": "3:35 PM on Wed, Jul 2; 5:15 PM on Thu, Jul 3; ",
+                "price": "€2,410"
+            },
+            {
+                "airline": "Turkish Airlines; ",
+                "time": "7:40 PM on Wed, Jul 2; 7:00 PM on Thu, Jul 3; ",
+                "price": "€2,496"
+            },
+            {
+                "airline": "Air France, Korean Air; ",
+                "time": "12:50 PM on Wed, Jul 2; 11:20 AM on Thu, Jul 3; ",
+                "price": "€2,919"
+            },
+            {
+                "airline": "Lufthansa; ANA; ",
+                "time": "9:10 AM on Wed, Jul 2; 7:15 AM on Thu, Jul 3; ",
+                "price": "€6,973"
+            },
+            {
+                "airline": "THAI; ",
+                "time": "1:40 PM on Wed, Jul 2; 3:55 PM on Thu, Jul 3; ",
+                "price": "€1,966"
+            },
+            {
+                "airline": "Air France, KLM; ",
+                "time": "12:15 PM on Wed, Jul 2; 10:20 AM on Thu, Jul 3; ",
+                "price": "€2,118"
+            },
+            {
+                "airline": "China Southern; ",
+                "time": "12:25 PM on Wed, Jul 2; 1:10 PM on Thu, Jul 3; ",
+                "price": "€2,183"
+            },
+            {
+                "airline": "China Southern; ",
+                "time": "12:25 PM on Wed, Jul 2; 9:00 PM on Thu, Jul 3; ",
+                "price": "€1,815"
+            },
+            {
+                "airline": "KLM; ",
+                "time": "10:15 AM on Wed, Jul 2; 10:20 AM on Thu, Jul 3; ",
+                "price": "€2,121"
+            },
+            {
+                "airline": "Vietnam Airlines; ",
+                "time": "2:00 PM on Wed, Jul 2; 6:40 AM on Fri, Jul 4; ",
+                "price": "€2,186"
+            },
+            {
+                "airline": "SWISS, THAI; ",
+                "time": "6:45 AM on Wed, Jul 2; 3:55 PM on Thu, Jul 3; ",
+                "price": "€2,292"
+            },
+            {
+                "airline": "China Eastern; ",
+                "time": "1:25 PM on Wed, Jul 2; 12:10 PM on Thu, Jul 3; ",
+                "price": "€2,401"
+            },
+            {
+                "airline": "Emirates; ",
+                "time": "3:35 PM on Wed, Jul 2; 5:15 PM on Thu, Jul 3; ",
+                "price": "€2,410"
+            },
+            {
+                "airline": "Turkish Airlines; ",
+                "time": "7:40 PM on Wed, Jul 2; 7:00 PM on Thu, Jul 3; ",
+                "price": "€2,496"
+            },
+            {
+                "airline": "Air France, Korean Air; ",
+                "time": "12:50 PM on Wed, Jul 2; 11:20 AM on Thu, Jul 3; ",
+                "price": "€2,919"
+            },
+            {
+                "airline": "Lufthansa; ANA; ",
+                "time": "9:10 AM on Wed, Jul 2; 7:15 AM on Thu, Jul 3; ",
+                "price": "€6,973"
+            }
+        ]
+    }
+]
