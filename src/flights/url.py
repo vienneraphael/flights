@@ -23,7 +23,8 @@ def generate_flight_url(
     - seat_type: str, class of service, e.g., "economy", "business" (default: "economy").
     - adults: int, number of adult passengers (default: 1).
     - children: int, number of child passengers (default: 0).
-    - infants in seat: int, number of infants sitting on laps ( default: 0).
+    - infants_in_seat: int, number of infants sitting on laps ( default: 0).
+    - infants_on_laps : int, number of infants on laps (default: 0).
     - currency: str, currency for pricing (default: "EUR").
 
     Returns:
