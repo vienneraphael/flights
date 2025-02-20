@@ -15,7 +15,7 @@ def generate_flight_url(
     """ 
     Generate Flights URL form parameters.
 
-    Paraleters:
+    Parameters:
     - departure_date: str,date of departure, formated as YYYY-DD-MM.
     - from_airport: str, IATA code of the departure airport (e.g., "CDG".)
     - to_airport: str, IATA code of the arrival airport (e.g., "JFK")
