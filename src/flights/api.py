@@ -35,7 +35,7 @@ def fetch_flight_data(
     }
     
     response = requests.post(api_url, json=payload, headers=headers)
-    response.raise_for_status()  # Raise an exception if the request fails
+    response.raise_for_status()  
     return response
 
 
