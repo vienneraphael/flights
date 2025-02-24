@@ -2,6 +2,8 @@ import requests
 import re
 import json
 from bs4 import BeautifulSoup
+from url import generate_flight_url
+
 
 def fetch_flight_data(
     api_url: str,
@@ -9,20 +11,18 @@ def fetch_flight_data(
     flight_url: str,
     zone: str,
   ) -> requests.Response:
-
     """
-  Fetches flight data from the specified API URL.
+    Fetches flight data from the specified API URL using BrightData.
 
-  Parameters:
-  - api_url: str, SERP API Url of BrightData.
-  - api_key: str, The API Key BrightData generate in your account.
-  - flight_url: str, URL containing flight search parameters.
-  - zone: str, Name of your API zone configuration project on BrightData.
+    Parameters:
+    - api_url (str): SERP API URL of BrightData.
+    - api_key (str): API key generated in your BrightData account.
+    - flight_url (str): URL containing flight search parameters.
+    - zone (str): Name of your BrightData API zone configuration project.
 
-  Returns:
-  - HTML code response for of the flight_url. 
-
-  """
+    Returns:
+    - requests.Response: Response object containing HTML content of the flight search page.
+    """
     payload = {
         "zone": zone,
         "url": flight_url,
@@ -33,110 +33,141 @@ def fetch_flight_data(
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    return requests.post(api_url, json=payload, headers=headers)
-
-def get_flight_texts(response):
-
-    soup = BeautifulSoup(response.text, "html.parser")
-    return list(set([tag.attrs['aria-label'] for tag in soup.select('li > div > div') if 'aria-label' in tag.attrs]))
     
+    response = requests.post(api_url, json=payload, headers=headers)
+    response.raise_for_status()  # Raise an exception if the request fails
+    return response
+
+
+def get_flight_description(response: requests.Response) -> list[str]:
     """
-    Extract flight information texts from the HTML response.
-    
+    Extracts flight information texts from the HTML response.
+
     Parameters:
-    - response: The API response containing flight data.
-    
+    - response (requests.Response): The API response containing flight data.
+
     Returns:
-    - List of flight descriptions extracted from HTML.
+    - list[str]: List of flight descriptions extracted from HTML.
     """
-  
-def extract_currency(flight_url):
-    
+    soup = BeautifulSoup(response.text, "html.parser")
+    return list(set(tag['aria-label'] for tag in soup.select('li > div > div') if 'aria-label' in tag.attrs))
+
+
+def extract_currency(flight_url: str) -> str:
+    """
+    Extracts the currency from the flight URL.
+
+    Parameters:
+    - flight_url (str): The URL containing the flight search parameters.
+
+    Returns:
+    - str: The detected currency, defaulting to "UNKNOWN" if not found.
+    """
     match = re.search(r"curr=([A-Z]+)", flight_url)
     return match.group(1) if match else "UNKNOWN"
 
+
+def extract_price(text: str, currency: str) -> str | None:
+    """Extracts the flight price from the text."""
+    match = re.search(r'From (\d+) euros', text)
+    return f"{match.group(1)} {currency}" if match else None
+
+
+def extract_airlines(text: str) -> list[str]:
+    """Extracts airline names from the text."""
+    match = re.findall(r'flight with ([\w\s&\-]+)', text)
+    return match[0].split(" and ") if match else []
+
+
+def extract_departure_time(text: str) -> str | None:
+    """Extracts the departure time from the text."""
+    match = re.search(r'Leaves [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)', text)
+    return match.group(1).replace("\u202f", " ").strip() if match else None
+
+
+def extract_arrival_time(text: str) -> str | None:
+    """Extracts the arrival time from the text."""
+    match = re.search(r'arrives at [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)', text)
+    return match.group(1).replace("\u202f", " ").strip() if match else None
+
+
+def extract_flight_duration(text: str) -> str | None:
+    """Extracts the total flight duration from the text."""
+    match = re.search(r'Total duration (\d+\s*hr\s*\d*\s*min)', text)
+    return match.group(1) if match else None
+
+
+def extract_layovers(text: str) -> int:
+    """Extracts the number of layovers from the text."""
+    match = re.search(r'(\d+) stop', text)
+    return int(match.group(1)) if match else 0
+
+
+def extract_layover_details(text: str) -> list[dict[str, str]]:
+    """Extracts detailed layover information from the text."""
+    layover_times = re.findall(r'Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min) layover', text)
+    layover_airports = re.findall(r'layover at ([\w\s]+) in ([\w\s]+)\.', text)
+
+    return [
+        {"layover_time": layover_times[i], "layover_airport": f"{layover_airports[i][0]} ({layover_airports[i][1]})"}
+        for i in range(min(len(layover_times), len(layover_airports)))
+    ]
+
+
+def extract_flight_info(flight_texts: list[str], currency: str) -> list[dict[str, str | int | list]]:
     """
-    Extract currency from the flight URL.
+    Extracts structured flight information from raw text data.
 
     Parameters:
-    - flight_url: The URL containing the flight search parameters.
+    - flight_texts (list[str]): List of raw text descriptions of flights.
+    - currency (str): The currency used for pricing.
 
     Returns:
-    - The detected currency (default: "UNKNOWN").
+    - list[dict[str, str | int | list]]: List of dictionaries containing structured flight details.
     """
-
-def extract_flight_info(flight_texts, currency):
-
     flight_list = []
-    
+
     for text in flight_texts:
-        flight_info = {}
-
-        # Extract price
-        price_match = re.search(r'From (\d+) euros', text)
-        flight_info['price'] = f"{price_match.group(1)} {currency}" if price_match else None
-
-        # Extract airlines
-        airline_match = re.findall(r'flight with ([\w\s&\-]+)', text)
-        flight_info['airlines'] = airline_match[0].split(" and ") if airline_match else []
-
-        # Extract departure time
-        departure_match = re.search(r'Leaves [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)', text)
-        flight_info['departure_time'] = departure_match.group(1).replace("\u202f", " ").strip() if departure_match else None
-
-        # Extract arrival time
-        arrival_match = re.search(r'arrives at [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)', text)
-        flight_info['arrival_time'] = arrival_match.group(1).replace("\u202f", " ").strip() if arrival_match else None
-
-        # Extract flight duration
-        duration_match = re.search(r'Total duration (\d+\s*hr\s*\d*\s*min)', text)
-        flight_info['flight_duration'] = duration_match.group(1) if duration_match else None
-
-        # Extract layovers
-        layover_match = re.search(r'(\d+) stop', text)
-        flight_info['layovers'] = int(layover_match.group(1)) if layover_match else 0
-
-        # Extract layover details
-        layover_time_match = re.findall(r'Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min) layover', text)
-        layover_airport_match = re.findall(r'layover at ([\w\s]+) in ([\w\s]+)\.', text)
-
-        layovers_list = [
-            {"layover_time": layover_time_match[i], "layover_airport": f"{layover_airport_match[i][0]} ({layover_airport_match[i][1]})"}
-            for i in range(len(layover_time_match))
-            if i < len(layover_airport_match)
-        ]
-
-        flight_info['layover_details'] = layovers_list
+        flight_info = {
+            "price": extract_price(text, currency),
+            "airlines": extract_airlines(text),
+            "departure_time": extract_departure_time(text),
+            "arrival_time": extract_arrival_time(text),
+            "flight_duration": extract_flight_duration(text),
+            "layovers": extract_layovers(text),
+            "layover_details": extract_layover_details(text),
+        }
         flight_list.append(flight_info)
 
     return flight_list
 
-    """
-    Extract structured flight information from raw text data.
-    
-    Parameters:
-    - flight_texts: List of raw text descriptions of flights.
-    
-    Returns:
-    - List of dictionaries containing structured flight details.
-    """
-
- # Exemple
+# Exemple 
 
 def main():
     api_url = "https://api.brightdata.com/request"
-    api_key = "your_api_key_there"  # Replace with your actual API key
-    flight_url = "https://www.google.com/travel/flights?tfs=GhoSCjIwMjUtMjgtMDNqBRIDQ0RHcgUSA0tJWEIDAQECSAGYAQI=&curr=EUR" # Replace with your actual flight_url
-    zone = "your_api_zone_there"  # Replace with the actual zone generate from BrightData
-    
-    response = fetch_flight_data(api_url, api_key, flight_url, zone)
-    if response.status_code == 200:
-        flight_texts = get_flight_texts(response)
+    api_key = "your_api_key"  # Replace with your actual API key
+    flight_url = generate_flight_url(
+        departure_date="2025-03-28",
+        from_airport="CDG",
+        to_airport="KIX",
+        trip_type="one-way",
+        seat_type="economy",
+        adults=1,
+        children=1,
+    )
+    zone = "your_BrightData_zone"  # Replace with your actual BrightData zone
+
+    try: 
+        response = fetch_flight_data(api_url, api_key, flight_url, zone)
+        flight_descriptions = get_flight_description(response)
         currency = extract_currency(flight_url)
-        flight_data = extract_flight_info(flight_texts, currency)
-        print(json.dumps(flight_data, indent=4)) # Convert dictionaries to json.
-    else:
-        print(f"Failed to fetch data: {response.status_code}")
+        flight_data = extract_flight_info(flight_descriptions, currency)
+
+        print(json.dumps(flight_data, indent=4))
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to fetch data: {e}")
+
 
 if __name__ == "__main__":
     main()
