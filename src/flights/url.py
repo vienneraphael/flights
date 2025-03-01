@@ -6,6 +6,7 @@ def generate_flight_url(
         to_airport: str,
         trip_type: str="one-way",
         seat_type: str="economy",
+        max_stops: int=None,
         adults: int=1,
         children: int=0,
         infants_in_seat: int=0,
@@ -39,6 +40,7 @@ def generate_flight_url(
                 to_airport=to_airport,
             )
         ],
+        max_stops=max_stops,
         trip=trip_type,
         seat=seat_type,
         passengers=Passengers(
