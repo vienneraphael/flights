@@ -1,5 +1,6 @@
 import requests
 import re
+import os
 import json
 from bs4 import BeautifulSoup
 from url import generate_flight_url
@@ -145,7 +146,7 @@ def extract_flight_info(flight_texts: list[str], currency: str) -> list[dict[str
 
 def main():
     api_url = "https://api.brightdata.com/request"
-    api_key = "your_api_key"  # Replace with your actual API key
+    api_key = os.getenv("BRIGHTDATA_API_KEY")
     flight_url = generate_flight_url(
         departure_date="2025-03-28",
         from_airport="CDG",
@@ -155,7 +156,7 @@ def main():
         adults=1,
         children=1,
     )
-    zone = "your_BrightData_zone"  # Replace with your actual BrightData zone
+    zone = os.getenv('BRIGHTDATA_ZONE')
 
     try: 
         response = fetch_flight_data(api_url, api_key, flight_url, zone)
