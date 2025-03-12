@@ -6,15 +6,13 @@ from pydantic import BaseModel, Field, computed_field
 from enum import StrEnum
 from dotenv import load_dotenv
 from fast_flights import Airport
-from flights.api import (
+from api import (
     get_flight_description,
     fetch_flight_data,
     extract_currency,
     extract_flight_info,
 )
-from flights.url import generate_flight_url
-
-
+from url import generate_flight_url
 
 class SeatType(StrEnum):
     ECONOMY = 'economy'
