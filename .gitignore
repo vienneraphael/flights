@@ -2,3 +2,18 @@
 *.json
 __pycache__
 uv.lock
+# Ignorer les fichiers spécifiques
+.env
+.gitignore.save
+api2.py
+logic_engine-round_trip.py
+logic_engine_one_way.py
+result_logi_engine
+src/flights/testcode.ipynb
+streamlit.py
+url2.py
+
+# Ignorer les dossiers spécifiques
+OtherTest/
+src/flights/__pycache__/
+
