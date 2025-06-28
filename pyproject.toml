@@ -1,5 +1,5 @@
 [project]
-name = "backend"
+name = "flights"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -9,4 +9,4 @@ dependencies = [
     "fast-flights>=2.2",
     "requests>=2.32.4",
 ]
-packages = ["backend/src/backend"]
+packages = ["backend"]
