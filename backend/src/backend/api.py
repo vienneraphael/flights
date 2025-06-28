@@ -1,8 +1,10 @@
-import requests
-import re
 import json
+import re
+
+import requests
 from bs4 import BeautifulSoup
-from url import generate_flight_url
+
+from backend.url import generate_flight_url
 
 
 def fetch_flight_data(
@@ -10,7 +12,7 @@ def fetch_flight_data(
     api_key: str,
     flight_url: str,
     zone: str,
-  ) -> requests.Response:
+) -> requests.Response:
     """
     Fetches flight data from the specified API URL using BrightData.
 
@@ -29,13 +31,10 @@ def fetch_flight_data(
         "format": "raw",
         "method": "GET",
     }
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+
     response = requests.post(api_url, json=payload, headers=headers)
-    response.raise_for_status()  
+    response.raise_for_status()
     return response
 
 
@@ -50,7 +49,13 @@ def get_flight_description(response: requests.Response) -> list[str]:
     - list[str]: List of flight descriptions extracted from HTML.
     """
     soup = BeautifulSoup(response.text, "html.parser")
-    return list(set(tag['aria-label'] for tag in soup.select('li > div > div') if 'aria-label' in tag.attrs))
+    return list(
+        set(
+            tag["aria-label"]
+            for tag in soup.select("li > div > div")
+            if "aria-label" in tag.attrs
+        )
+    )
 
 
 def extract_currency(flight_url: str) -> str:
@@ -69,52 +74,59 @@ def extract_currency(flight_url: str) -> str:
 
 def extract_price(text: str, currency: str) -> str | None:
     """Extracts the flight price from the text."""
-    match = re.search(r'From (\d+) euros', text)
+    match = re.search(r"From (\d+) euros", text)
     return f"{match.group(1)} {currency}" if match else None
 
 
 def extract_airlines(text: str) -> list[str]:
     """Extracts airline names from the text."""
-    match = re.findall(r'flight with ([\w\s&\-]+)', text)
+    match = re.findall(r"flight with ([\w\s&\-]+)", text)
     return match[0].split(" and ") if match else []
 
 
 def extract_departure_time(text: str) -> str | None:
     """Extracts the departure time from the text."""
-    match = re.search(r'Leaves [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)', text)
+    match = re.search(r"Leaves [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)", text)
     return match.group(1).replace("\u202f", " ").strip() if match else None
 
 
 def extract_arrival_time(text: str) -> str | None:
     """Extracts the arrival time from the text."""
-    match = re.search(r'arrives at [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)', text)
+    match = re.search(r"arrives at [\w\s]+ at (\d{1,2}:\d{2}\s*[APM]{2}?)", text)
     return match.group(1).replace("\u202f", " ").strip() if match else None
 
 
 def extract_flight_duration(text: str) -> str | None:
     """Extracts the total flight duration from the text."""
-    match = re.search(r'Total duration (\d+\s*hr\s*\d*\s*min)', text)
+    match = re.search(r"Total duration (\d+\s*hr\s*\d*\s*min)", text)
     return match.group(1) if match else None
 
 
 def extract_layovers(text: str) -> int:
     """Extracts the number of layovers from the text."""
-    match = re.search(r'(\d+) stop', text)
+    match = re.search(r"(\d+) stop", text)
     return int(match.group(1)) if match else 0
 
 
 def extract_layover_details(text: str) -> list[dict[str, str]]:
     """Extracts detailed layover information from the text."""
-    layover_times = re.findall(r'Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min) layover', text)
-    layover_airports = re.findall(r'layover at ([\w\s]+) in ([\w\s]+)\.', text)
+    layover_times = re.findall(
+        r"Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min) layover", text
+    )
+    layover_airports = re.findall(r"layover at ([\w\s]+) in ([\w\s]+)\.", text)
 
     return [
-        {"layover_time": layover_times[i], "layover_airport": f"{layover_airports[i][0]} ({layover_airports[i][1]})"}
+        {
+            "layover_time": layover_times[i],
+            "layover_airport": f"{layover_airports[i][0]} ({layover_airports[i][1]})",
+        }
         for i in range(min(len(layover_times), len(layover_airports)))
     ]
 
 
-def extract_flight_info(flight_texts: list[str], currency: str) -> list[dict[str, str | int | list]]:
+def extract_flight_info(
+    flight_texts: list[str], currency: str
+) -> list[dict[str, str | int | list]]:
     """
     Extracts structured flight information from raw text data.
 
@@ -141,7 +153,9 @@ def extract_flight_info(flight_texts: list[str], currency: str) -> list[dict[str
 
     return flight_list
 
-# Exemple 
+
+# Exemple
+
 
 def main():
     api_url = "https://api.brightdata.com/request"
@@ -157,16 +171,12 @@ def main():
     )
     zone = "your_BrightData_zone"  # Replace with your actual BrightData zone
 
-    try: 
-        response = fetch_flight_data(api_url, api_key, flight_url, zone)
-        flight_descriptions = get_flight_description(response)
-        currency = extract_currency(flight_url)
-        flight_data = extract_flight_info(flight_descriptions, currency)
+    response = fetch_flight_data(api_url, api_key, flight_url, zone)
+    flight_descriptions = get_flight_description(response)
+    currency = extract_currency(flight_url)
+    flight_data = extract_flight_info(flight_descriptions, currency)
 
-        print(json.dumps(flight_data, indent=4))
-
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to fetch data: {e}")
+    print(json.dumps(flight_data, indent=4))
 
 
 if __name__ == "__main__":
