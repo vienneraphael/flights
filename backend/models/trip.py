@@ -72,7 +72,7 @@ class Trip(BaseModel):
 
     @computed_field
     @cached_property
-    def possible_trips(self) -> list[TripFlight]:
+    def candidate_trips(self) -> list[TripFlight]:
         trips = []
         it = iter(self.steps)
         for departure, arrival in zip(it, it, strict=True):
