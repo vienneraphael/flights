@@ -112,7 +112,9 @@ class Trip(BaseModel):
                 poi.constraint_value.max_days for poi in self.points_of_interest
             ]
             passed_tests = True
-            for days_diff, constraint_value in zip(diff, constraint_values):
+            for days_diff, constraint_value in zip(
+                diff, constraint_values, strict=True
+            ):
                 if days_diff.days > constraint_value:
                     passed_tests = False
                     break
