@@ -1,8 +1,10 @@
 import json
+import os
 import re
 
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
 from backend.url import generate_flight_url
 
@@ -158,10 +160,11 @@ def extract_flight_info(
 
 
 def main():
+    load_dotenv(override=True)
     api_url = "https://api.brightdata.com/request"
-    api_key = "your_api_key"  # Replace with your actual API key
+    api_key = os.getenv("BRIGHTDATA_API_KEY") or ""
     flight_url = generate_flight_url(
-        departure_date="2025-03-28",
+        departure_date="2025-07-28",
         from_airport="CDG",
         to_airport="KIX",
         trip_type="one-way",
@@ -169,7 +172,7 @@ def main():
         adults=1,
         children=1,
     )
-    zone = "your_BrightData_zone"  # Replace with your actual BrightData zone
+    zone = os.getenv("BRIGHTDATA_API_ZONE") or ""
 
     response = fetch_flight_data(api_url, api_key, flight_url, zone)
     flight_descriptions = get_flight_description(response)
