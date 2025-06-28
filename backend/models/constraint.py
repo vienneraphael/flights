@@ -1,6 +1,7 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+from functools import cached_property
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, computed_field, model_validator
 
 
 class DurationConstraint(BaseModel):
@@ -39,6 +40,7 @@ class DateConstraint(BaseModel):
             values["max_date"] = datetime.strptime(
                 values.get("max_date"), "%Y-%m-%d"
             ).date()
+        return values
 
     @model_validator(mode="before")
     @classmethod
@@ -49,3 +51,11 @@ class DateConstraint(BaseModel):
             if min_date > max_date:
                 raise ValueError("min_date cannot be greater than max_date")
         return values
+
+    @computed_field
+    @cached_property
+    def possible_dates(self) -> list[date]:
+        days_difference = (self.max_date - self.min_date).days
+        return [
+            self.min_date + timedelta(days=days) for days in range(days_difference + 1)
+        ]
