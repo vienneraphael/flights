@@ -98,6 +98,8 @@ mdurl==0.1.2
     # via markdown-it-py
 nest-asyncio==1.6.0
     # via ipykernel
+numpy==2.3.1
+    # via flights
 packaging==25.0
     # via ipykernel
 parso==0.8.4
