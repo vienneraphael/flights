@@ -9,3 +9,4 @@ dependencies = [
     "fast-flights>=2.2",
     "requests>=2.32.4",
 ]
+packages = ["backend/src/backend"]
