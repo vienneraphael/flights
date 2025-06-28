@@ -109,7 +109,7 @@ class Trip(BaseModel):
             flight_dates = [flight.departure_date for flight in candidate_trip]
             diff = np.diff(flight_dates)
             constraint_values = [
-                poi.constraint_value.max_days for poi in self.points_of_interest
+                poi.duration_constraint.max_days for poi in self.points_of_interest
             ]
             passed_tests = True
             for days_diff, constraint_value in zip(
