@@ -95,7 +95,7 @@ class Trip(BaseModel):
         validated_trips = []
         candidate_trips = self.candidate_trips
         for candidate_trip in candidate_trips:
-            flight_dates = [flight.departure_dates for flight in candidate_trip]
+            flight_dates = [flight.departure_date for flight in candidate_trip]
             diff = np.diff(flight_dates)
             constraint_values = [
                 poi.constraint_value.max_days for poi in self.points_of_interest
