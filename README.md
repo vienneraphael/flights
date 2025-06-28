@@ -3,6 +3,7 @@
 The goal of this project is to provide a tool for optimizing flight travel costs using a flights API.
 
 The project features an app allowing the user to select:
+
 - A minimal departure date
 - A maximal return date
 - The origin city (e.g. Paris or France)
@@ -13,14 +14,13 @@ Note that destinations or origin can also be countries. In this case, all the ai
 
 It's also possible to enter a list of airports codes.
 
-# Roadmap
-
 ## tfs Builder
 
 Build a function that encodes flight search parameters in a google flights url under the `tfs` flag (see `fast-flights` python library for that).
 
 ## Flights API
-Retrieve flight data from an external API (https://brightdata.com/pricing/serp)
+
+Retrieve flight data from an external API (<https://brightdata.com/pricing/serp>)
 Note: use the `&curr=EUR` flag at the end of the url to get results in euros.
 
 ## Logic Engine
