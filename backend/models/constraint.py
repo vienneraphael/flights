@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel, model_validator
 
@@ -27,6 +27,18 @@ class DateConstraint(BaseModel):
 
     min_date: date
     max_date: date
+
+    @model_validator(mode="before")
+    @classmethod
+    def convert_str_to_date(cls, values):
+        if isinstance(values.get("min_date"), str):
+            values["min_date"] = datetime.strptime(
+                values.get("min_date"), "%Y-%m-%d"
+            ).date()
+        if isinstance(values.get("max_date"), str):
+            values["max_date"] = datetime.strptime(
+                values.get("max_date"), "%Y-%m-%d"
+            ).date()
 
     @model_validator(mode="before")
     @classmethod
