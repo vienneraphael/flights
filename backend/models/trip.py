@@ -1,4 +1,5 @@
-from datetime import timedelta
+import itertools
+from datetime import date, timedelta
 from enum import StrEnum
 from functools import cached_property
 
@@ -19,6 +20,12 @@ class TripStep(BaseModel):
     name: str
     type: TripStepType
     date_constraint: DateConstraint
+
+
+class TripFlight(BaseModel):
+    departure_date: date
+    from_airport: str
+    to_airport: str
 
 
 class Trip(BaseModel):
@@ -62,3 +69,21 @@ class Trip(BaseModel):
             )
         )
         return trip_steps
+
+    @computed_field
+    @cached_property
+    def possible_trips(self) -> list[TripFlight]:
+        trips = []
+        it = iter(self.steps)
+        for departure, arrival in zip(it, it, strict=True):
+            trip_flights = []
+            for possible_date in departure.date_constraint.possible_dates:
+                trip_flights.append(
+                    TripFlight(
+                        departure_date=possible_date,
+                        from_airport=departure.name,
+                        to_airport=arrival.name,
+                    )
+                )
+            trips.append(trip_flights)
+        return list(itertools.product(*trips))
