@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from enum import StrEnum
 from functools import cached_property
 
+import numpy as np
 from pydantic import BaseModel, computed_field
 
 from backend.models.constraint import DateConstraint
@@ -72,7 +73,7 @@ class Trip(BaseModel):
 
     @computed_field
     @cached_property
-    def candidate_trips(self) -> list[TripFlight]:
+    def candidate_trips(self) -> list[tuple[TripFlight]]:
         trips = []
         it = iter(self.steps)
         for departure, arrival in zip(it, it, strict=True):
@@ -87,3 +88,27 @@ class Trip(BaseModel):
                 )
             trips.append(trip_flights)
         return list(itertools.product(*trips))
+
+    @computed_field
+    @cached_property
+    def possible_trips(self) -> list[tuple[TripFlight]]:
+        validated_trips = []
+        candidate_trips = self.candidate_trips
+        for candidate_trip in candidate_trips:
+            flight_dates = [flight.departure_date for flight in candidate_trip]
+            diff = np.diff(flight_dates)
+            constraint_values = [
+                poi.duration_constraint.max_days for poi in self.points_of_interest
+            ]
+            passed_tests = True
+            for days_diff, constraint_value in zip(
+                diff, constraint_values, strict=True
+            ):
+                if days_diff.days > constraint_value:
+                    passed_tests = False
+                    break
+            if not passed_tests:
+                continue
+            if flight_dates[-1] < self.end_point.date_constraint.max_date:
+                validated_trips.append(candidate_trip)
+        return validated_trips
