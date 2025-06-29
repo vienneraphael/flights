@@ -30,7 +30,7 @@ async def fetch_flight_data(
     api_key = os.getenv("BDT_API_KEY") or ""
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(
             "https://api.brightdata.com/request",
             json=payload,
