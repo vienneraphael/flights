@@ -1,5 +1,4 @@
 *.ipynb
-*.json
 __pycache__
 .env
 flights.egg-info
