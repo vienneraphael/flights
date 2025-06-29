@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from backend.models.trip import Trip
+from backend.models.trip import Scenario, UserTrip
 from backend.utils import fetch_flights_from_urls
 
 load_dotenv(override=True)
