@@ -74,10 +74,10 @@ def extract_currency(flight_url: str) -> str:
     return match.group(1) if match else "UNKNOWN"
 
 
-def extract_price(text: str, currency: str) -> str | None:
+def extract_price(text: str, currency: str) -> int | None:
     """Extracts the flight price from the text."""
     match = re.search(r"From (\d+) euros", text)
-    return f"{match.group(1)} {currency}" if match else None
+    return int(match.group(1)) if match else None
 
 
 def extract_airlines(text: str) -> list[str]:
