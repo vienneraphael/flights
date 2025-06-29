@@ -46,6 +46,10 @@ class TripFlight(BaseModel):
         return hash(self.url)
 
 
+class Scenario(BaseModel):
+    flights: list[TripFlight]
+
+
 class UserTrip(BaseModel):
     start_point: StartPoint
     points_of_interest: list[PointOfInterest]
@@ -90,7 +94,7 @@ class UserTrip(BaseModel):
 
     @computed_field
     @cached_property
-    def candidate_trips(self) -> list[list[TripFlight]]:
+    def candidate_trips(self) -> list[Scenario]:
         trips = []
         it = iter(self.steps)
         for departure, arrival in zip(it, it, strict=True):
@@ -105,16 +109,17 @@ class UserTrip(BaseModel):
                 )
             trips.append(trip_flights)
         return [
-            list(flight_combination) for flight_combination in itertools.product(*trips)
+            Scenario(flights=list(flight_combination))
+            for flight_combination in itertools.product(*trips)
         ]
 
     @computed_field
     @cached_property
-    def possible_trips(self) -> list[list[TripFlight]]:
+    def possible_trips(self) -> list[Scenario]:
         validated_trips = []
         candidate_trips = self.candidate_trips
         for candidate_trip in candidate_trips:
-            flight_dates = [flight.departure_date for flight in candidate_trip]
+            flight_dates = [flight.departure_date for flight in candidate_trip.flights]
             diff = np.diff(flight_dates)
             constraint_values = [
                 poi.duration_constraint.max_days for poi in self.points_of_interest
@@ -129,10 +134,11 @@ class UserTrip(BaseModel):
             if not passed_tests:
                 continue
             if flight_dates[-1] < self.end_point.date_constraint.max_date:
-                validated_trips.append(candidate_trip)
+                validated_trips.append(Scenario(flights=candidate_trip.flights))
         return validated_trips
 
     @computed_field
     @cached_property
     def unique_requests(self) -> list[TripFlight]:
-        return list(set(np.array(self.possible_trips).flatten().tolist()))
+        possible_trips = [scenario.flights for scenario in self.possible_trips]
+        return list(set(np.array(possible_trips).flatten().tolist()))
