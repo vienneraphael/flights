@@ -28,7 +28,7 @@ class TripFlight(BaseModel):
     departure_date: date
     from_airport: str
     to_airport: str
-    result: dict | None = Field(
+    result: list[dict] | None = Field(
         None, description="flight results from Google Flights", init=False
     )
 
