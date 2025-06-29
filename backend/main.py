@@ -30,4 +30,6 @@ async def fetch_multiple_flights(trip: Trip):
     results = await fetch_flights_from_urls(
         urls=[flight_req.url for flight_req in flight_requests]
     )
+    for result in results.values():
+        result["flights"] = sorted(result["flights"], key=lambda d: d.get("price"))[:3]
     return results
