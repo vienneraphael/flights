@@ -101,7 +101,8 @@ def extract_layovers(text: str) -> int:
 def extract_layover_details(text: str) -> list[dict[str, str]]:
     """Extracts detailed layover information from the text."""
     layover_times = re.findall(
-        r"Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min) layover", text
+        r"Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min)(?: overnight)? layover",
+        text,
     )
     layover_airports = re.findall(r"layover at ([\w\s]+) in ([\w\s]+)\.", text)
 
