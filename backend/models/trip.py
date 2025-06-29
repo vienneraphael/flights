@@ -7,6 +7,7 @@ from pydantic import BaseModel, computed_field
 
 from backend.models.constraint import DateConstraint
 from backend.models.poi import EndPoint, PointOfInterest, StartPoint
+from backend.url import generate_flight_url
 
 
 # Arrival is arrival in an airport
@@ -26,6 +27,16 @@ class TripFlight(BaseModel):
     departure_date: date
     from_airport: str
     to_airport: str
+
+    @computed_field
+    @cached_property
+    def url(self) -> str:
+        formatted_date = self.departure_date.strftime("%Y-%d-%m")
+        return generate_flight_url(
+            departure_date=formatted_date,
+            from_airport=self.from_airport,
+            to_airport=self.to_airport,
+        )
 
 
 class Trip(BaseModel):
