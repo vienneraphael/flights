@@ -2,16 +2,16 @@ import json
 import os
 import re
 
-import requests
+import httpx
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 from backend.url import generate_flight_url
 
 
-def fetch_flight_data(
+async def fetch_flight_data(
     flight_url: str,
-) -> requests.Response:
+) -> httpx.Response:
     """
     Fetches flight data from the specified API URL using BrightData.
 
@@ -19,7 +19,7 @@ def fetch_flight_data(
     - flight_url (str): URL containing flight search parameters.
 
     Returns:
-    - requests.Response: Response object containing HTML content of the flight search page.
+    - httpx.Response: Response object containing HTML content of the flight search page.
     """
     payload = {
         "zone": os.getenv("BDT_API_ZONE") or "",
@@ -30,19 +30,22 @@ def fetch_flight_data(
     api_key = os.getenv("BDT_API_KEY") or ""
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
-    response = requests.post(
-        "https://api.brightdata.com/request", json=payload, headers=headers
-    )
-    response.raise_for_status()
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://api.brightdata.com/request",
+            json=payload,
+            headers=headers,
+        )
+        response.raise_for_status()
     return response
 
 
-def get_flight_description(response: requests.Response) -> list[str]:
+def get_flight_description(response: httpx.Response) -> list[str]:
     """
     Extracts flight information texts from the HTML response.
 
     Parameters:
-    - response (requests.Response): The API response containing flight data.
+    - response (httpx.Response): The API response containing flight data.
 
     Returns:
     - list[str]: List of flight descriptions extracted from HTML.
@@ -156,7 +159,7 @@ def extract_flight_info(
 # Exemple
 
 
-def main():
+async def main():
     load_dotenv(override=True)
     flight_url = generate_flight_url(
         departure_date="2025-07-28",
@@ -167,7 +170,7 @@ def main():
         adults=1,
         children=1,
     )
-    response = fetch_flight_data(flight_url=flight_url)
+    response = await fetch_flight_data(flight_url=flight_url)
     flight_descriptions = get_flight_description(response)
     currency = extract_currency(flight_url)
     flight_data = extract_flight_info(flight_descriptions, currency)
@@ -176,4 +179,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+
+    asyncio.run(main())

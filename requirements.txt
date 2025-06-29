@@ -64,7 +64,9 @@ httpcore==1.0.9
 httptools==0.6.4
     # via uvicorn
 httpx==0.28.1
-    # via fastapi
+    # via
+    #   fastapi
+    #   flights
 idna==3.10
     # via
     #   anyio
