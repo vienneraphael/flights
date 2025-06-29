@@ -121,7 +121,6 @@ def extract_flight_info(flight_texts: list[str]) -> list[dict[str, str | int | l
 
     Parameters:
     - flight_texts (list[str]): List of raw text descriptions of flights.
-    - currency (str): The currency used for pricing.
 
     Returns:
     - list[dict[str, str | int | list]]: List of dictionaries containing structured flight details.
@@ -138,7 +137,8 @@ def extract_flight_info(flight_texts: list[str]) -> list[dict[str, str | int | l
             "layovers": extract_layovers(text),
             "layover_details": extract_layover_details(text),
         }
-        flight_list.append(flight_info)
+        if flight_info.get("price") is not None:
+            flight_list.append(flight_info)
 
     return flight_list
 
