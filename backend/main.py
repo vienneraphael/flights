@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 
 from backend.api import (
-    extract_currency,
     extract_flight_info,
     fetch_flight_data,
     get_flight_description,
@@ -34,8 +33,7 @@ async def fetch_from_urls(urls: list[str]):
         try:
             response = task.result()
             descriptions = get_flight_description(response)
-            currency = extract_currency(url)
-            flight_data = extract_flight_info(descriptions, currency)
+            flight_data = extract_flight_info(descriptions)
             results[hash(url)] = {"url": url, "flights": flight_data}
         except Exception as e:
             results[hash(url)] = {"url": url, "error": e}
@@ -58,8 +56,7 @@ async def fetch_multiple_flights(trip: Trip):
         try:
             response = task.result()
             descriptions = get_flight_description(response)
-            currency = extract_currency(url)
-            flight_data = extract_flight_info(descriptions, currency)
+            flight_data = extract_flight_info(descriptions)
             results[hash(url)] = {"url": url, "flights": flight_data}
         except Exception as e:
             results[hash(url)] = {"url": url, "error": e}
