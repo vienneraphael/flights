@@ -35,7 +35,7 @@ class TripFlight(BaseModel):
     @computed_field
     @cached_property
     def url(self) -> str:
-        formatted_date = self.departure_date.strftime("%Y-%d-%m")
+        formatted_date = self.departure_date.strftime("%Y-%m-%d")
         return generate_flight_url(
             departure_date=formatted_date,
             from_airport=self.from_airport,
@@ -48,6 +48,12 @@ class TripFlight(BaseModel):
 
 class Scenario(BaseModel):
     flights: list[TripFlight]
+
+    @computed_field
+    @cached_property
+    def min_total_price(self) -> int:
+        minimal_price_flights = [flight.result[0]["price"] for flight in self.flights]
+        return sum(minimal_price_flights)
 
 
 class UserTrip(BaseModel):
