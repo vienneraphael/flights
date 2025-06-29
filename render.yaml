@@ -1,0 +1,55 @@
+# This file uses the Render Blueprint format:
+# See https://render.com/docs/blueprint-spec for details
+
+# ============================================================
+# SERVICES
+# ============================================================
+services:
+  # ----------------------------------------------------------
+  # Web Service: filtergenie
+  # ----------------------------------------------------------
+  - name: flights
+    type: web
+    runtime: docker
+    plan: starter
+    repo: https://github.com/vienneraphael/flights
+    region: frankfurt
+    branch: main
+
+    # -------------------------------
+    # Docker Configuration
+    # -------------------------------
+    dockerfilePath: ./Dockerfile
+
+    # -------------------------------
+    # Deployment Settings
+    # -------------------------------
+    autoDeployTrigger: checksPass
+    healthCheckPath: /health
+
+    # -------------------------------
+    # Build Configuration
+    # -------------------------------
+    buildFilter:
+      # --- Included Paths ---
+      paths:
+        - backend/**
+        - render.yaml
+        - Dockerfile
+        - docker-entrypoint.sh
+        - .dockerignore
+        - .python-version
+        - uv.lock
+      # --- Ignored Paths ---
+      ignoredPaths:
+        - backend/tests/**
+
+    # -------------------------------
+    # Environment Variables
+    # -------------------------------
+    envVars:
+      # --- API Authentication ---
+      - key: BDT_API_KEY
+        value: null
+      - key: BDT_API_ZONE
+        value: null
