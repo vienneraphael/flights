@@ -69,7 +69,8 @@ def extract_price(text: str, currency: str) -> int | None:
 
 def extract_airlines(text: str) -> list[str]:
     """Extracts airline names from the text."""
-    match = re.findall(r"flight with ([\w\s&\-]+)", text)
+    pattern = r"with\s+(.+?)\."
+    match = re.findall(pattern, text)
     return match[0].split(" and ") if match else []
 
 
