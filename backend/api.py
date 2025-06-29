@@ -88,7 +88,7 @@ def extract_arrival_time(text: str) -> str | None:
 
 def extract_flight_duration(text: str) -> str | None:
     """Extracts the total flight duration from the text."""
-    match = re.search(r"Total duration (\d+\s*hr\s*\d*\s*min)", text)
+    match = re.search(r"Total duration (\d+\s*hr(?:\s*\d*\s*min)?)", text)
     return match.group(1) if match else None
 
 
@@ -101,7 +101,7 @@ def extract_layovers(text: str) -> int:
 def extract_layover_details(text: str) -> list[dict[str, str]]:
     """Extracts detailed layover information from the text."""
     layover_times = re.findall(
-        r"Layover \(\d+ of \d+\) is a (\d+\s*hr\s*\d*\s*min)(?: overnight)? layover",
+        r"Layover \(\d+ of \d+\) is a (\d+\s*hr(?:\s*\d*\s*min)?)(?: overnight)? layover",
         text,
     )
     layover_airports = re.findall(r"layover at ([\w\s]+) in ([\w\s]+)\.", text)
