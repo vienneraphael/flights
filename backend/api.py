@@ -60,7 +60,7 @@ def get_flight_description(response: httpx.Response) -> list[str]:
     )
 
 
-def extract_price(text: str, currency: str) -> int | None:
+def extract_price(text: str) -> int | None:
     """Extracts the flight price from the text."""
     pattern = r"From (\d+) ([A-Za-z])"
     match = re.search(pattern, text, flags=re.IGNORECASE)
@@ -130,6 +130,7 @@ def extract_flight_info(flight_texts: list[str]) -> list[dict[str, str | int | l
 
     for text in flight_texts:
         flight_info = {
+            "price": extract_price(text),
             "airlines": extract_airlines(text),
             "departure_time": extract_departure_time(text),
             "arrival_time": extract_arrival_time(text),
