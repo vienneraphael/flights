@@ -39,4 +39,4 @@ async def fetch_multiple_flights(trip: UserTrip):
         for trip_flight in scenario.flights:
             unique_id = hash(trip_flight)
             trip_flight.result = results[unique_id]["flights"]
-    return possible_trips
+    return sorted(possible_trips, key=lambda d: d.min_total_price)
