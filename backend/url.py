@@ -59,7 +59,7 @@ def generate_flight_url(
 # Exemple
 def main():
     url = generate_flight_url(
-        departure_date="2025-28-03",
+        departure_date="2025-09-28",
         from_airport="CDG",
         to_airport="KIX",
         trip_type="one-way",
