@@ -13,14 +13,14 @@ from backend.url import generate_flight_url
 
 # Arrival is arrival in an airport
 # Departure is the departure form a airport
-class TripStepType(StrEnum):
+class UserTripStepType(StrEnum):
     ARRIVAL = "Arrival"
     DEPARTURE = "Departure"
 
 
-class TripStep(BaseModel):
+class UserTripStep(BaseModel):
     name: str
-    type: TripStepType
+    type: UserTripStepType
     date_constraint: DateConstraint
 
 
@@ -46,31 +46,31 @@ class TripFlight(BaseModel):
         return hash(self.url)
 
 
-class Trip(BaseModel):
+class UserTrip(BaseModel):
     start_point: StartPoint
     points_of_interest: list[PointOfInterest]
     end_point: EndPoint
 
     @computed_field
     @cached_property
-    def steps(self) -> list[TripStep]:
-        previous_step = TripStep(
+    def steps(self) -> list[UserTripStep]:
+        previous_step = UserTripStep(
             name=self.start_point.name,
-            type=TripStepType.DEPARTURE,
+            type=UserTripStepType.DEPARTURE,
             date_constraint=self.start_point.date_constraint,
         )
         trip_steps = [previous_step]
         for point_of_interest in self.points_of_interest:
             trip_steps.append(
-                TripStep(
+                UserTripStep(
                     name=point_of_interest.arrival_name,
-                    type=TripStepType.ARRIVAL,
+                    type=UserTripStepType.ARRIVAL,
                     date_constraint=previous_step.date_constraint,
                 )
             )
-            previous_step = TripStep(
+            previous_step = UserTripStep(
                 name=point_of_interest.departure_name,
-                type=TripStepType.DEPARTURE,
+                type=UserTripStepType.DEPARTURE,
                 date_constraint=DateConstraint(
                     min_date=previous_step.date_constraint.min_date
                     + timedelta(days=point_of_interest.duration_constraint.min_days),
@@ -80,9 +80,9 @@ class Trip(BaseModel):
             )
             trip_steps.append(previous_step)
         trip_steps.append(
-            TripStep(
+            UserTripStep(
                 name=self.end_point.name,
-                type=TripStepType.ARRIVAL,
+                type=UserTripStepType.ARRIVAL,
                 date_constraint=self.end_point.date_constraint,
             )
         )
@@ -90,7 +90,7 @@ class Trip(BaseModel):
 
     @computed_field
     @cached_property
-    def candidate_trips(self) -> list[tuple[TripFlight]]:
+    def candidate_trips(self) -> list[list[TripFlight]]:
         trips = []
         it = iter(self.steps)
         for departure, arrival in zip(it, it, strict=True):
@@ -104,11 +104,13 @@ class Trip(BaseModel):
                     )
                 )
             trips.append(trip_flights)
-        return list(itertools.product(*trips))
+        return [
+            list(flight_combination) for flight_combination in itertools.product(*trips)
+        ]
 
     @computed_field
     @cached_property
-    def possible_trips(self) -> list[tuple[TripFlight]]:
+    def possible_trips(self) -> list[list[TripFlight]]:
         validated_trips = []
         candidate_trips = self.candidate_trips
         for candidate_trip in candidate_trips:

@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
-from backend.models.trip import Trip
+from backend.models.trip import TripFlight, UserTrip
 from backend.utils import fetch_flights_from_urls
 
 load_dotenv(override=True)
@@ -21,15 +21,22 @@ async def root():
 @app.post("/flights_from_urls/")
 async def fetch_from_urls(urls: list[str]):
     results = await fetch_flights_from_urls(urls=urls)
+    for result in results.values():
+        result["flights"] = sorted(result["flights"], key=lambda d: d.get("price"))[:3]
     return results
 
 
-@app.post("/flights/")
-async def fetch_multiple_flights(trip: Trip):
+@app.post("/flights/", response_model=list[list[TripFlight]])
+async def fetch_multiple_flights(trip: UserTrip):
     flight_requests = trip.unique_requests
     results = await fetch_flights_from_urls(
         urls=[flight_req.url for flight_req in flight_requests]
     )
     for result in results.values():
         result["flights"] = sorted(result["flights"], key=lambda d: d.get("price"))[:3]
-    return results
+    possible_trips = trip.possible_trips
+    for possible_trip in possible_trips:
+        for trip_flight in possible_trip:
+            unique_id = hash(trip_flight)
+            trip_flight.result = results[unique_id]["flights"]
+    return possible_trips
