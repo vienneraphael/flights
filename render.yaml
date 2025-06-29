@@ -11,7 +11,7 @@ services:
   - name: flights
     type: web
     runtime: docker
-    plan: starter
+    plan: free
     repo: https://github.com/vienneraphael/flights
     region: frankfurt
     branch: main
