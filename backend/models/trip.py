@@ -29,6 +29,11 @@ class TripFlight(BaseModel):
     from_airport: str
     to_airport: str
 
+    def __hash__(self):
+        return hash(
+            f"{self.departure_date.strftime('%Y-%d-%m')}_{self.from_airport}_{self.to_airport}"
+        )
+
     @computed_field
     @cached_property
     def url(self) -> str:
