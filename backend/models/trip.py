@@ -128,3 +128,8 @@ class Trip(BaseModel):
             if flight_dates[-1] < self.end_point.date_constraint.max_date:
                 validated_trips.append(candidate_trip)
         return validated_trips
+
+    @computed_field
+    @cached_property
+    def unique_requests(self) -> list[TripFlight]:
+        return list(set(np.array(self.possible_trips).flatten().tolist()))
