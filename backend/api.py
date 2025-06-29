@@ -10,32 +10,29 @@ from backend.url import generate_flight_url
 
 
 def fetch_flight_data(
-    api_url: str,
-    api_key: str,
     flight_url: str,
-    zone: str,
 ) -> requests.Response:
     """
     Fetches flight data from the specified API URL using BrightData.
 
     Parameters:
-    - api_url (str): SERP API URL of BrightData.
-    - api_key (str): API key generated in your BrightData account.
     - flight_url (str): URL containing flight search parameters.
-    - zone (str): Name of your BrightData API zone configuration project.
 
     Returns:
     - requests.Response: Response object containing HTML content of the flight search page.
     """
     payload = {
-        "zone": zone,
+        "zone": os.getenv("BDT_API_ZONE") or "",
         "url": flight_url,
         "format": "raw",
         "method": "GET",
     }
+    api_key = os.getenv("BDT_API_KEY") or ""
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
 
-    response = requests.post(api_url, json=payload, headers=headers)
+    response = requests.post(
+        "https://api.brightdata.com/request", json=payload, headers=headers
+    )
     response.raise_for_status()
     return response
 
@@ -161,8 +158,6 @@ def extract_flight_info(
 
 def main():
     load_dotenv(override=True)
-    api_url = "https://api.brightdata.com/request"
-    api_key = os.getenv("BRIGHTDATA_API_KEY") or ""
     flight_url = generate_flight_url(
         departure_date="2025-07-28",
         from_airport="CDG",
@@ -172,9 +167,7 @@ def main():
         adults=1,
         children=1,
     )
-    zone = os.getenv("BRIGHTDATA_API_ZONE") or ""
-
-    response = fetch_flight_data(api_url, api_key, flight_url, zone)
+    response = fetch_flight_data(flight_url=flight_url)
     flight_descriptions = get_flight_description(response)
     currency = extract_currency(flight_url)
     flight_data = extract_flight_info(flight_descriptions, currency)
