@@ -60,23 +60,10 @@ def get_flight_description(response: httpx.Response) -> list[str]:
     )
 
 
-def extract_currency(flight_url: str) -> str:
-    """
-    Extracts the currency from the flight URL.
-
-    Parameters:
-    - flight_url (str): The URL containing the flight search parameters.
-
-    Returns:
-    - str: The detected currency, defaulting to "UNKNOWN" if not found.
-    """
-    match = re.search(r"curr=([A-Z]+)", flight_url)
-    return match.group(1) if match else "UNKNOWN"
-
-
 def extract_price(text: str, currency: str) -> int | None:
     """Extracts the flight price from the text."""
-    match = re.search(r"From (\d+) euros", text)
+    pattern = r"From (\d+) ([A-Za-z])"
+    match = re.search(pattern, text, flags=re.IGNORECASE)
     return int(match.group(1)) if match else None
 
 
@@ -126,9 +113,7 @@ def extract_layover_details(text: str) -> list[dict[str, str]]:
     ]
 
 
-def extract_flight_info(
-    flight_texts: list[str], currency: str
-) -> list[dict[str, str | int | list]]:
+def extract_flight_info(flight_texts: list[str]) -> list[dict[str, str | int | list]]:
     """
     Extracts structured flight information from raw text data.
 
@@ -143,7 +128,6 @@ def extract_flight_info(
 
     for text in flight_texts:
         flight_info = {
-            "price": extract_price(text, currency),
             "airlines": extract_airlines(text),
             "departure_time": extract_departure_time(text),
             "arrival_time": extract_arrival_time(text),
@@ -162,7 +146,7 @@ def extract_flight_info(
 async def main():
     load_dotenv(override=True)
     flight_url = generate_flight_url(
-        departure_date="2025-07-28",
+        departure_date="2025-09-28",
         from_airport="CDG",
         to_airport="KIX",
         trip_type="one-way",
@@ -170,10 +154,11 @@ async def main():
         adults=1,
         children=1,
     )
+    print(flight_url)
+
     response = await fetch_flight_data(flight_url=flight_url)
     flight_descriptions = get_flight_description(response)
-    currency = extract_currency(flight_url)
-    flight_data = extract_flight_info(flight_descriptions, currency)
+    flight_data = extract_flight_info(flight_descriptions)
 
     print(json.dumps(flight_data, indent=4))
 
