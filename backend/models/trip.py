@@ -4,7 +4,7 @@ from enum import StrEnum
 from functools import cached_property
 
 import numpy as np
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, Field, computed_field
 
 from backend.models.constraint import DateConstraint
 from backend.models.poi import EndPoint, PointOfInterest, StartPoint
@@ -28,6 +28,9 @@ class TripFlight(BaseModel):
     departure_date: date
     from_airport: str
     to_airport: str
+    result: dict | None = Field(
+        None, description="flight results from Google Flights", init=False
+    )
 
     @computed_field
     @cached_property
